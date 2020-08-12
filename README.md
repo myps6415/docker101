@@ -128,8 +128,6 @@ docker container ls -a
 ```
 
 ## Dockerfile 觀念
-![](https://i.imgur.com/qNAfR9I.png)
-
 ### 建立 Dockerfile
 #### FROM
 * 取得什麼 image
