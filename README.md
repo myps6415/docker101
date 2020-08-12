@@ -147,3 +147,5 @@ ENTRYPOINT ["httpd", "-D", "FOREGROUND"]
 RUN apk --update add apache2
 RUN rm -rf /var/cache/apk/*
 ```
+* 每個 run 是不同的 container，不相通
+* 要寫在同一行才會相互影響，透過 Linux 指令 `&&` 相接
