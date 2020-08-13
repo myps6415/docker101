@@ -149,3 +149,46 @@ RUN rm -rf /var/cache/apk/*
 ```
 * 每個 run 是不同的 container，不相通
 * 要寫在同一行才會相互影響，透過 Linux 指令 `&&` 相接
+
+#### ENV
+* 設定統一的變數
+* 這邊的範例設定 `ENV` 為 `myworkdir`，接下來的 `RUN` 便可帶入 `myworkdir`
+```dockerfile=
+ENV myworkdir /var/www/localhost/htdocs
+RUN cd ${myworkdir} \
+    && echo "<h3>I am John. I'm taking this great Docker Course. Round 01<h3>" >> index.html
+```
+
+#### WORKDIR
+* 搭配 `ENV` 可更簡潔 Dockerfile
+```dockerfile=
+ENV myworkdir /var/www/localhost/htdocs
+WORKDIR ${myworkdir}
+RUN echo "<h3>I am John. I'm taking this great Docker Course. Round 01<h3>" >> index.html
+```
+
+#### ARG
+* 用於設定變數，這邊的範例用於設定名字
+```dockerfile=
+ENV myworkdir /var/www/localhost/htdocs
+WORKDIR ${myworkdir}
+ARG whoami=John
+RUN echo "<h3>I am ${whoami}. I'm taking this great Docker Course. Round 01<h3>" >> index.html
+```
+* 依照上列設定可印出：
+```
+I am John. I'm taking this great Docker Course. Round 01
+```
+* 在 docker build image 時可使用 `--build-arg` 設定 arg 變數
+```shell=
+docker build --build-arg whoami=Tony -t hsiaoyu/007 .
+docker run -d -p 8007:80 hsiaoyu/007
+```
+
+#### COPY
+* 將檔案放入 container 空間的根目錄
+* `./content.txt`: 當前 Linux VM 的空間
+* `./`: Container 空間，這邊會放到 `ENV` 設定的路徑底下
+```dockerfile= 
+COPY ./content.txt ./
+```
