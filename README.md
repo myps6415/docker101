@@ -192,3 +192,20 @@ docker run -d -p 8007:80 hsiaoyu/007
 ```dockerfile= 
 COPY ./content.txt ./
 ```
+
+## Docker 網路模式
+### None 模式
+* 不能向外連
+* 外面也連不進去
+* 封閉的網路空間
+
+### Bridge 模式
+* 把容器放在某個 Bridge Network 中
+
+### Container 模式
+* 對應其他容器得到網路標籤
+
+### Host 模式
+* 和 Linux VM Network 取得 ip 標籤
+* 屬於 Linux VM Network
+* 可以和 Linux 上其他的程序互通網路
