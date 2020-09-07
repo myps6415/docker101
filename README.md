@@ -209,3 +209,52 @@ COPY ./content.txt ./
 * 和 Linux VM Network 取得 ip 標籤
 * 屬於 Linux VM Network
 * 可以和 Linux 上其他的程序互通網路
+
+### 操作指令
+#### 列出現有的 network
+```shell=
+docker network ls
+```
+
+#### 以 `none` 網路模式執行 alpine，並持續 `tail -f /dev/null`
+```shell=
+docker run -d --network none --name none-mode alpine tail -f /dev/null
+```
+
+#### 列出 `none` 網路模式下的詳細資訊
+```shell=
+docker network inspect none
+```
+
+#### 建立新的 bridge 網路，命名為 my-bridge
+```shell=
+docker network create --driver bridge my-bridge
+```
+
+* 查詢 my-bridge 網路資訊
+```shell=
+docker network inspect my-bridge
+```
+
+#### 啟一個 Container 執行 alpine `tail -f /dev/null`，命名為 `bridge-mode001`，並使用上面所建立的 `my-bridge` 網路模式
+```shell=
+docker run -d --network my-bridge --name bridge-mode001 alpine tail -f /dev/null
+```
+
+* 此時透過 `docker network inspect my-bridge` 查看，會發現 bridge-mode001 這個 Container 已經加入 my-bridge 網路環境中
+* 連入 Container
+```shell=
+docker exec -it 8b651c72dd63361db7a6f58f6e55546beb3a5c1d2afd9e2aef750e8ab594d858 /bin/sh
+```
+
+#### 將 Container 加入現有的 bridge network 中
+* bridge-mode001 and bridge-mode002 are in bridge named my-bridge
+* bridge-mode003 is in bridge named their-bridge
+* add bridge-mode003 to bridge named my-bridge
+```shell=
+docker network connect my-bridge bridge-mode003
+```
+* check my-bridge inspect
+```shell=
+docker network inspect my-bridge
+```
