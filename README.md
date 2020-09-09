@@ -258,3 +258,68 @@ docker network connect my-bridge bridge-mode003
 ```shell=
 docker network inspect my-bridge
 ```
+
+#### Container Mode
+* 建立一個 container mode 的 container
+```shell=
+docker run -d --network container:bridge-mode001 --name container-mode001 alpine tail -f /dev/null
+```
+
+## Docker Volume
+* Container Disk: 啟一台 Container 後會產生 Tmp 存放空間，若 Container 刪除後則會一併刪除
+* Linux VM Disk: Container 刪除後仍會存在
+* Mac Host Disk: 本機端的儲存空間
+* 預設 `docker run` 是使用 Container Disk，刪除後資料就會一併刪除
+
+### 操作指令
+* 列出現有的 Volume
+```shell=
+docker volume ls
+```
+* 建立 Volume
+```shell=
+docker volume create mainpage-vol
+```
+* 查看 Volume 詳細資訊
+```shell=
+docker volume inspect mainpage-vol
+```
+輸出：
+```
+[
+    {
+        "CreatedAt": "2020-09-09T03:04:18Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/mnt/sda1/var/lib/docker/volumes/mainpage-vol/_data",
+        "Name": "mainpage-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+```
+* 啟一個 Container，使用 mainpage-vol Valume
+    * 把 `mainpage-vol:/var/www/localhost/htdocs/` mapping 起來
+    * `mainpage-vol` 為 VM Linux Disk
+    * `/var/www/localhost/htdocs/` 為 Container Disk 空間
+    * 上面兩個空間會相互影響
+```scala=
+docker run -d -p 8081:80 -v mainpage-vol:/var/www/localhost/htdocs/ john/apache001
+```
+* 若 `-v` 後面沒加 Volume 名稱，系統會自動建立新的 Volume
+```
+docker run -d -p 8082:80 -v /var/www/localhost/htdocs/ john/apache001
+```
+用 `docker volume ls` 驗證會看到自動產生的亂數 Volume Name:
+```
+DRIVER              VOLUME NAME
+local               6ac41ebd8aa5e60e463fbd7020e364a3d779712e3c8d35b46a800c22f629c6ea
+local               mainpage-vol
+```
+
+## Docker Compose
+* 幫忙管理 Docker 的各項功能
+    * Service
+    * Network
+    * Volume
+* 可以透過 Docker Compose 一次啟起多個 Container
