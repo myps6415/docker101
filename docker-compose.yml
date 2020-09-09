@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
