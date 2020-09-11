@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
+    networks:
+      - mybridge001
+  myweb2:
+    build:
+      context: .
+      args:
+        whoami: "Chris"
+    image: john/myweb1:latest
+    ports:
+      - "8081:80"
+    networks:
+      - mybridge001
+  myweb3:
+    build:
+      context: .
+      args:
+        whoami: "Jane"
+    image: john/myweb2:latest
+    ports:
+      - "8082:80"
+    networks:
+      - mybridge001
+  myweb4:
+    image: john/myweb:latest
+    ports:
+      - "8083:80"
+    networks:
+      - mybridge002
+
+networks:
+  mybridge001:
+  mybridge002:

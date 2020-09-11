@@ -323,3 +323,164 @@ local               mainpage-vol
     * Network
     * Volume
 * 可以透過 Docker Compose 一次啟起多個 Container
+### 建立 Docker-Compose file
+#### Docker-Compose Services
+* yaml 格式
+```yaml=
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
+```
+* 使用的 Dockerfile
+```dockerfile=
+FROM alpine:latest
+ENV myworkdir /var/www/localhost/htdocs/
+ARG whoami=John
+WORKDIR ${myworkdir}
+RUN apk --update add apache2
+RUN rm -rf /var/cache/apk/*
+RUN echo "<h3>I am ${whoami}. I am taking this great Docker Course. Round 01<h3>" >> index.html
+RUN echo "<h3>I am ${whoami}. I am taking this great Docker Course. Round 02<h3>" >> index.html
+RUN echo "<h3>I am ${whoami}. I am taking this great Docker Course. Round 03<h3>" >> index.html
+ENTRYPOINT ["httpd", "-D", "FOREGROUND"]
+```
+* 透過 Docker-Compose 建立 image
+    * `--no-cache` 會讓它每次 build 重新跑一次，避免有些東西沒有更新到
+```shell=
+docker-compose build --no-cache
+```
+* 透過 Docker-Compose 把所有東西啟起來
+```shell=
+docker-compose up -d
+```
+* 透過 Docker-Compose 把所有的 Container 下架
+```shell=
+docker-compose down
+```
+* Docker-Compose 可以同時啟多個 Container，docker-compose.yml 範例：
+```yaml=
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
+  myweb2:
+    build:
+      context: .
+      args:
+        whoami: "Chris"
+    image: john/myweb1:latest
+    ports:
+      - "8081:80"
+  myweb3:
+    build:
+      context: .
+      args:
+        whoami: "Jane"
+    image: john/myweb2:latest
+    ports:
+      - "8082:80"
+```
+* 若要設定 Container 不要從頭建立，而是直接取用現有的 image，設定如 `myweb4`
+```yaml=
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
+  myweb2:
+    build:
+      context: .
+      args:
+        whoami: "Chris"
+    image: john/myweb1:latest
+    ports:
+      - "8081:80"
+  myweb3:
+    build:
+      context: .
+      args:
+        whoami: "Jane"
+    image: john/myweb2:latest
+    ports:
+      - "8082:80"
+  myweb4:
+    image: john/myweb:latest
+    ports:
+      - "8083:80"
+```
+#### Docker-Compose Networks
+* Docker-Compose 啟起 Container 時會使用路徑位置名稱啟一個 bridge network
+    * 路徑位置：`~/Docker-Compose/Networks`
+    * network name：`networks_default`
+* 可以在 yaml 中設定自建 networks，並指定 Container 使用指定的 network：
+```yaml=
+version: "3.7"
+services:
+  myweb:
+    build:
+      context: .
+      args:
+        whoami: "Tony"
+    image: john/myweb:latest
+    ports:
+      - "8080:80"
+    networks:
+      - mybridge001
+  myweb2:
+    build:
+      context: .
+      args:
+        whoami: "Chris"
+    image: john/myweb1:latest
+    ports:
+      - "8081:80"
+    networks:
+      - mybridge001
+  myweb3:
+    build:
+      context: .
+      args:
+        whoami: "Jane"
+    image: john/myweb2:latest
+    ports:
+      - "8082:80"
+    networks:
+      - mybridge001
+  myweb4:
+    image: john/myweb:latest
+    ports:
+      - "8083:80"
+    networks:
+      - mybridge002
+
+networks:
+  mybridge001:
+  mybridge002:
+```
+
+```
+其他網路模式的設定方式，可以參考下列官網：
+
+https://docs.docker.com/compose/compose-file/#network_mode
+
+這邊提供一個 host 模式的設定示範 (教材-docker-compose-host-mode.yml)
+另外可以結合我們在網路章節學到的概念，搭配這個文件自己試試看其他模式
+```
