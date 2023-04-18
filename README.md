@@ -1,5 +1,5 @@
-# docker-learning
-learning docker technology by myself
+# docker101
+*learning docker technology*
 * 簡化部署流程
 * 跨平台部署
 * 建立乾淨測試環境
